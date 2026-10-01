@@ -1,0 +1,9 @@
+*secret*
+*.key
+*.pem
+kubeconfig
+k3s.yaml
+.env
+*.log
+# the snapshot dumps contain live Secret objects — review before committing
+manifests/*-secrets.yaml
