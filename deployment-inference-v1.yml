@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: litellm-db, namespace: inference }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: litellm-db } }
+  template:
+    metadata: { labels: { app: litellm-db } }
+    spec:
+      nodeSelector: { node-role.kubernetes.io/control-plane: "true" }
+      tolerations:
+      - { key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule }
+      containers:
+      - name: postgres
+        image: postgres:16
+        env:
+        - { name: POSTGRES_USER, value: litellm }
+        - { name: POSTGRES_PASSWORD, value: litellm }
+        - { name: POSTGRES_DB, value: litellm }
+        ports: [{ containerPort: 5432 }]
+        volumeMounts: [{ name: data, mountPath: /var/lib/postgresql/data }]
+      volumes:
+      - { name: data, emptyDir: {} }   # ephemeral for the lab; use a PVC to persist keys
+---
+apiVersion: v1
+kind: Service
+metadata: { name: litellm-db, namespace: inference }
+spec:
+  selector: { app: litellm-db }
+  ports: [{ port: 5432, targetPort: 5432 }]

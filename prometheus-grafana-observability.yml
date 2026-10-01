@@ -1,0 +1,14 @@
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+helm install kube-prom prometheus-community/kube-prometheus-stack \
+  -n monitoring --create-namespace \
+  --set prometheus.prometheusSpec.nodeSelector."node-role\.kubernetes\.io/control-plane"=true \
+  --set prometheus.prometheusSpec.tolerations[0].key=node-role.kubernetes.io/control-plane \
+  --set prometheus.prometheusSpec.tolerations[0].operator=Exists \
+  --set prometheus.prometheusSpec.tolerations[0].effect=NoSchedule \
+  --set grafana.nodeSelector."node-role\.kubernetes\.io/control-plane"=true \
+  --set grafana.tolerations[0].key=node-role.kubernetes.io/control-plane \
+  --set grafana.tolerations[0].operator=Exists \
+  --set grafana.tolerations[0].effect=NoSchedule \
+  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+  --wait --timeout 10m
