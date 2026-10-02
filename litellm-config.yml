@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  config.yaml: |
+    model_list:
+      - model_name: qwen-14b
+        litellm_params:
+          model: openai/Qwen/Qwen2.5-14B-Instruct
+          api_base: http://vllm-14b.inference.svc.cluster.local:8000/v1
+          api_key: "dummy"        # vLLM doesn't check it, but litellm requires the field
+    litellm_settings:
+      drop_params: true
+      success_callback: ["langfuse"]
+      failure_callback: ["langfuse"]
+kind: ConfigMap
+metadata:
+  name: litellm-config
+  namespace: inference
